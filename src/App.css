@@ -15,6 +15,30 @@
   justify-content: center;
 }
 
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(8, 10vw);
+  }
+
+  .grid div {
+    width: 10vw;
+    height: 10vw;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .grid {
+    grid-template-columns: repeat(16, 20px);
+  }
+
+  .grid div {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
