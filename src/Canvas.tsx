@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import ColourPicker from './ColourPicker'
 import { LOCAL_STORAGE_KEYS } from './constants'
+import { db, auth } from '../firebaseConfig'
+import { collection, addDoc , query, where, getDocs, /*onSnapshot*/ } from 'firebase/firestore'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const Canvas: React.FC = () => {
-  type Drawing = {
-    name: string;
-    grid: string[][];
+  
+  interface Drawing {
+    uid: string
+    userId: string
+    name: string
+    grid: string[][]
   }
   
   const gridHeight = 16
@@ -19,7 +25,7 @@ const Canvas: React.FC = () => {
     Array.from({ length: gridHeight }, () => Array(gridWidth).fill('#ffffff'))
   )
 
-// #region Load local storage
+// #region Load local/firebase storage
 
   useEffect(() => {
     const savedGrid = localStorage.getItem(LOCAL_STORAGE_KEYS.PIXEL_GRID)
@@ -35,12 +41,46 @@ const Canvas: React.FC = () => {
     window.addEventListener('mouseup', handleGlobalMouseUp)
     window.addEventListener('touchend', handleGlobalMouseUp)
 
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User signed in: " + user.uid)
+        fetchDrawings(user.uid)
+      }
+    })
+
     // Clean up the event listeners when the component unmounts
     return () => {
       window.removeEventListener('mouseup', handleGlobalMouseUp)
       window.removeEventListener('touchend', handleGlobalMouseUp)
+      unsubscribe()
     };
   }, [])
+
+  async function fetchDrawings(userId: string) {
+      const q = query(
+      collection(db, 'drawings'),
+      where ('userId', '==', userId)
+      )
+
+      console.log("Fetching drawings...")
+
+      try {
+        const querySnapshot = await getDocs(q)
+        const drawings = querySnapshot.docs.map((doc) => {
+          const data = doc.data()
+          return {
+            uid: doc.id,
+            name: data.name,
+            grid: expandGrid(data.grid, gridWidth,gridHeight)    
+          }
+        }) as Drawing[]
+
+        console.log("Drawings: " + drawings)
+        setSavedDrawings(drawings)
+      } catch (error) {
+        console.error("Error fetching drawings: ", error)
+      }
+  }
 
 // #endregion
 
@@ -78,13 +118,34 @@ const Canvas: React.FC = () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.SELECTED_COLOUR, colour)
   }
 
-  const saveDrawing = () => {
+  async function saveDrawing() {
     const drawingName = prompt('Enter a name for this drawing:')
-    if (drawingName) {
-      const newSavedDrawings = [...savedDrawings, { name: drawingName, grid }]
-      setSavedDrawings(newSavedDrawings)
-      localStorage.setItem(LOCAL_STORAGE_KEYS.SAVED_DRAWINGS, JSON.stringify(newSavedDrawings))
+    console.log("Current user:", auth.currentUser)
+    if (drawingName && auth.currentUser) {
+      const drawingData = {
+        userId: auth.currentUser.uid,
+        name: drawingName,
+        grid: flattenGrid(grid)
+      }
+
+      await addDoc(collection(db, 'drawings'), drawingData)
+      // const newSavedDrawings = [...savedDrawings, drawingData ]
+      // setSavedDrawings(newSavedDrawings)
+      // localStorage.setItem(LOCAL_STORAGE_KEYS.SAVED_DRAWINGS, JSON.stringify(newSavedDrawings))
+      fetchDrawings(auth.currentUser.uid)
     }
+  }
+
+  function flattenGrid(grid: string[][]): string[] {
+    return grid.flat()
+  }
+
+  function expandGrid(flatGrid: string[], width: number, height: number): string[][] {
+    const expandedGrid: string[][] = []
+    for (let i = 0; i < height; i++) {
+      expandedGrid.push(flatGrid.slice(i * width, (i + 1) * width))
+    }
+    return expandedGrid
   }
 
   const loadDrawing = (drawingGrid: string[][]) => {
