@@ -66,3 +66,116 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.auth-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* Dimmed overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal box styling */
+.auth-modal {
+  background-color: #242424;
+  width: 90%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  position: relative;
+}
+
+/* Close button styling */
+.auth-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  width: 25px;
+  height: 25px;
+  border: 1px solid #aaa;
+  background: none;
+  color: #aaa;
+  /* border-radius: 50%; */
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  
+}
+
+.auth-modal-close:hover {
+  color: #ddd;
+  border-color: #ddd;
+}
+
+/* Modal content */
+.auth-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Input field styling */
+.auth-modal-input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  outline: none;
+}
+
+.auth-modal-input:focus {
+  border-color: #007bff; /* Optional color change for focus */
+}
+
+/* Button styling */
+.auth-modal-button {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 1rem;
+}
+
+.auth-modal-button:hover {
+  background-color: #0056b3;
+}
+
+/* Toggle button for switching between Sign Up and Login */
+.auth-modal-toggle {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-decoration: underline;
+}
+
+.auth-modal-toggle:hover {
+  color: #0056b3;
+}
+
+/* Heading styling */
+.auth-modal h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #aaa;
+}

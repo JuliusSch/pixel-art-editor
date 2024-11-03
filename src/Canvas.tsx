@@ -1,22 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import ColourPicker from './ColourPicker'
 import { LOCAL_STORAGE_KEYS } from './constants'
-import { db, auth } from '../firebaseConfig'
-import { collection, addDoc , query, where, getDocs, /*onSnapshot*/ } from 'firebase/firestore'
+import { fetchDrawings, saveDrawing, Drawing } from './drawingsService'
+import { auth } from '../firebaseConfig'
 import { onAuthStateChanged } from 'firebase/auth'
 
 const Canvas: React.FC = () => {
-  
-  interface Drawing {
-    uid: string
-    userId: string
-    name: string
-    grid: string[][]
-  }
-  
-  const gridHeight = 16
-  const gridWidth = 16
-  
+  // Eventually make these dynamic and don't have versions in here and also in drawingsService
+  const gridHeight = 16;
+  const gridWidth = 16;
+
   const [selectedColour, setSelectedColour] = useState('#000000')
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [savedDrawings, setSavedDrawings] = useState<Drawing[]>([])
@@ -41,10 +34,11 @@ const Canvas: React.FC = () => {
     window.addEventListener('mouseup', handleGlobalMouseUp)
     window.addEventListener('touchend', handleGlobalMouseUp)
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         console.log("User signed in: " + user.uid)
-        fetchDrawings(user.uid)
+        const drawings = await fetchDrawings(user.uid)
+        setSavedDrawings(drawings)
       }
     })
 
@@ -55,32 +49,6 @@ const Canvas: React.FC = () => {
       unsubscribe()
     };
   }, [])
-
-  async function fetchDrawings(userId: string) {
-      const q = query(
-      collection(db, 'drawings'),
-      where ('userId', '==', userId)
-      )
-
-      console.log("Fetching drawings...")
-
-      try {
-        const querySnapshot = await getDocs(q)
-        const drawings = querySnapshot.docs.map((doc) => {
-          const data = doc.data()
-          return {
-            uid: doc.id,
-            name: data.name,
-            grid: expandGrid(data.grid, gridWidth,gridHeight)    
-          }
-        }) as Drawing[]
-
-        console.log("Drawings: " + drawings)
-        setSavedDrawings(drawings)
-      } catch (error) {
-        console.error("Error fetching drawings: ", error)
-      }
-  }
 
 // #endregion
 
@@ -118,34 +86,13 @@ const Canvas: React.FC = () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.SELECTED_COLOUR, colour)
   }
 
-  async function saveDrawing() {
+  const saveCurrentDrawing = async () => {
     const drawingName = prompt('Enter a name for this drawing:')
-    console.log("Current user:", auth.currentUser)
     if (drawingName && auth.currentUser) {
-      const drawingData = {
-        userId: auth.currentUser.uid,
-        name: drawingName,
-        grid: flattenGrid(grid)
-      }
-
-      await addDoc(collection(db, 'drawings'), drawingData)
-      // const newSavedDrawings = [...savedDrawings, drawingData ]
-      // setSavedDrawings(newSavedDrawings)
-      // localStorage.setItem(LOCAL_STORAGE_KEYS.SAVED_DRAWINGS, JSON.stringify(newSavedDrawings))
-      fetchDrawings(auth.currentUser.uid)
+      await saveDrawing(drawingName, grid)
+      const updatedDrawings = await fetchDrawings(auth.currentUser.uid)
+      setSavedDrawings(updatedDrawings)
     }
-  }
-
-  function flattenGrid(grid: string[][]): string[] {
-    return grid.flat()
-  }
-
-  function expandGrid(flatGrid: string[], width: number, height: number): string[][] {
-    const expandedGrid: string[][] = []
-    for (let i = 0; i < height; i++) {
-      expandedGrid.push(flatGrid.slice(i * width, (i + 1) * width))
-    }
-    return expandedGrid
   }
 
   const loadDrawing = (drawingGrid: string[][]) => {
@@ -189,7 +136,7 @@ const Canvas: React.FC = () => {
         </div>
         <div>
           <button onClick={clearCanvas}>Clear Canvas</button>
-          <button onClick={saveDrawing}>Save Drawing</button>
+          <button onClick={saveCurrentDrawing}>Save Drawing</button>
         </div>
         <div>
           <h3>Saved Drawings</h3>

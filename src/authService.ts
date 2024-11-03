@@ -1,15 +1,24 @@
-import { signInAnonymously, onAuthStateChanged, User } from 'firebase/auth'
+import { onAuthStateChanged, User, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../firebaseConfig'
 
-export const authenticateUser = async (): Promise<User | null> => {
+export const signUpUser = async (username: string, password: string) => {
   try {
-    await signInAnonymously(auth);
+    const userCredential = await createUserWithEmailAndPassword(auth, username, password)
+    return userCredential.user
   } catch (error) {
-    console.error('Error signing in anonymously:', error)
+    console.error("Error signing up: ", error)
   }
-  return auth.currentUser
-};
+}
+
+export const loginUser = async (username: string, password: string) => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, username, password)
+    return userCredential.user
+  } catch (error) {
+    console.error("Error loggin in: ", error)
+  }
+}
 
 export const onAuthChange = (callback: (user: User | null) => void) => {
-  onAuthStateChanged(auth, callback)
-};
+  return onAuthStateChanged(auth, callback)
+}

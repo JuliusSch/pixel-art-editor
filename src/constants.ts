@@ -1,4 +1,5 @@
 export const LOCAL_STORAGE_KEYS = {
   PIXEL_GRID: 'pixelGrid',
-  SELECTED_COLOUR: 'selectedColour'
+  SELECTED_COLOUR: 'selectedColour',
+  SAVED_DRAWINGS: 'savedDrawings'
 }

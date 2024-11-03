@@ -13,5 +13,4 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 export const db = getFirestore(app)
-/** @type {import('firebase/auth').Auth} */
 export const auth = getAuth(app)
