@@ -1,26 +1,72 @@
-import './App.css'
-import Canvas from './Canvas'
-import AuthModal from './AuthModal'
-import { useState, useEffect } from 'react'
-import { onAuthChange } from './authService'
-import { fetchDrawings, Drawing } from './drawingsService'
+import './styles/app.css'
+import './styles/sidebar.css'
+import Canvas, { CanvasHandle, gridWidth, gridHeight } from './components/Canvas'
+import AuthModal from './components/AuthModal'
+import { useState, useEffect, useRef } from 'react'
+import { onAuthChange } from './services/authService'
+import { fetchDrawings, saveDrawing, Drawing } from './services/drawingsService'
 import { auth } from '../firebaseConfig'
+import ColourPicker from './components/ColourPicker'
+import { LOCAL_STORAGE_KEYS } from './constants'
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [, setDrawings] = useState<Drawing[]>([])
+  const [savedDrawings, setDrawings] = useState<Drawing[]>([])
+  const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+  const [selectedColour, setSelectedColour] = useState('#000000')
+
+  const canvasRef = useRef<CanvasHandle>(null);
   
-  // const handleModalOpen = () => setIsModalOpen(true)
+  const toggleSidebar = () => {
+    setIsSideBarOpen(!isSideBarOpen)
+  }
+
   function handleModalClose() { setIsModalOpen(false) }
 
   const updateAfterLogin = async () => {
-    try {
-      const fetchedDrawings = await fetchDrawings(auth.currentUser ? auth.currentUser.uid : "")
-      setDrawings(fetchedDrawings)
-    } catch (error) {
-      console.error(' Error updating after login: ', error)
+    const userId = auth.currentUser?.uid
+    if (userId) {
+      try {
+        const fetchedDrawings = await fetchDrawings(userId)
+        setDrawings(fetchedDrawings)
+      } catch (error) {
+        console.error(' Error updating after login: ', error)
+      }
     }
   }
+  
+  const saveCurrentDrawing = async () => {
+    if (auth.currentUser) {
+      if (canvasRef.current) {
+        console.log(auth.currentUser)
+        // await canvasRef.current.saveCurrentDrawing()
+        const drawingName = prompt('Enter a name for this drawing:')
+        if (drawingName && auth.currentUser) {
+          await saveDrawing(drawingName, canvasRef.current.getGrid())
+          const updatedDrawings = await fetchDrawings(auth.currentUser.uid)
+          setDrawings(updatedDrawings)
+        }
+      }
+    } else {
+      setIsModalOpen(true)
+    }
+  }
+
+  const loadDrawing = (drawingGrid: string[][]) => {
+    if (canvasRef.current) {
+      console.log("load drawing")
+      canvasRef.current.setGrid(drawingGrid)
+      // localStorage.setItem(LOCAL_STORAGE_KEYS.PIXEL_GRID, JSON.stringify(drawingGrid))
+    }
+  }
+
+  const clearCanvas = () => {
+    if (canvasRef.current) {
+        const emptyGrid = Array.from({ length: gridHeight }, () => Array(gridWidth).fill('#ffffff'))
+        canvasRef.current.setGrid(emptyGrid)
+        // localStorage.setItem(LOCAL_STORAGE_KEYS.PIXEL_GRID, JSON.stringify(emptyGrid))
+      }
+    }
 
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
@@ -29,6 +75,10 @@ function App() {
       else
         setDrawings([])
     })
+
+    const savedColour = localStorage.getItem(LOCAL_STORAGE_KEYS.SELECTED_COLOUR)
+    if (savedColour) setSelectedColour(savedColour)
+
     return () => unsubscribe()
   }, [])
 
@@ -36,15 +86,37 @@ function App() {
     <>
       <div>
         <h1>Pixel Art Editor</h1>
+        <div className={`sidebar ${isSideBarOpen ? 'open' : 'closed'}`}>
+          <button className='sidebar-toggle' onClick={toggleSidebar}>
+            {isSideBarOpen ? '<' : '>'}
+          </button>
+          {isSideBarOpen && (
+            <div className='saved-drawings-list'>
+              <h3>Saved Drawings</h3>
+              <ul>
+                {savedDrawings.map((drawing, index) => (
+                  <li key={index}>
+                    <button onClick={() => loadDrawing(drawing.grid)}>{drawing.name}</button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
         <button onClick={() => setIsModalOpen(true)} style={{ position: 'absolute', top: 10, right: 10 }}>
-          Sign Up/Login
+          {auth.currentUser ? 'Logged In' : 'Sign Up/Login'}
         </button>
         <AuthModal
-          isOpen={isModalOpen}
+          isOpen={isModalOpen && !auth.currentUser} // very bad code and temp
           onClose={handleModalClose}
           onAuthSuccess={updateAfterLogin}
         />
-        <Canvas />
+        <Canvas selectedColour={selectedColour}/>
+        <ColourPicker selectedColour={selectedColour} setSelectedColour={setSelectedColour}/>
+        <div className='canvas-buttons'>
+          <button className='canvas-button' onClick={clearCanvas}>Clear Canvas</button>
+          <button className='canvas-button' onClick={saveCurrentDrawing}>Save Drawing</button>
+        </div>
       </div>
     </>
   )

@@ -1,19 +1,24 @@
-import React from 'react'
 import { HexColorPicker } from "react-colorful";
+import { LOCAL_STORAGE_KEYS } from '../constants'
 
 interface ColourPickerProps {
   selectedColour: string
-  onColourChange: (colour: string) => void
+  setSelectedColour: (colour: string) => void
 }
 
-const ColourPicker: React.FC<ColourPickerProps> = ({ selectedColour, onColourChange }) =>
+function ColourPicker({ selectedColour, setSelectedColour }: ColourPickerProps)
 {
+  const handleColourChange = (colour: string) => {
+      setSelectedColour(colour)
+      localStorage.setItem(LOCAL_STORAGE_KEYS.SELECTED_COLOUR, colour)
+    }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '10px' }}>
       <HexColorPicker
         color={selectedColour}
-        onChange={onColourChange}
-        style={{ width: '100%', maxWidth: '200px', margin: '10px 0' }}
+        onChange={handleColourChange}
+        style={{ width: '100%', maxWidth: '292px', margin: '10px 0' }}
       />
       <div style={{
         marginTop: '10px',
@@ -26,12 +31,6 @@ const ColourPicker: React.FC<ColourPickerProps> = ({ selectedColour, onColourCha
         {selectedColour.toUpperCase()}
       </div>
     </div>
-    // <input
-    //   type = "colour"
-    //   value = {selectedColour}
-    //   onChange = {(e) => onColourChange(e.target.value)}
-    //   style = {{ marginBottom: '10px' }}
-    // />
   )
 }
 

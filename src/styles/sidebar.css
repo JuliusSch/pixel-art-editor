@@ -1,0 +1,65 @@
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 200px; /* Adjust width as needed */
+  max-width: 100%;
+  background-color: #333; /* Darker background to contrast */
+  color: white;
+  padding: 20px;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar.closed {
+  transform: translateX(-75%);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-toggle {
+  position: absolute;
+  left: 160px; /* Adjust based on sidebar width */
+  top: 10px;
+  background-color: #555;
+  color: white;
+  border-radius: 50%;
+  border: none;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  z-index: 1001; /* Layer above sidebar */
+}
+
+.sidebar.collapsed + .sidebar-toggle {
+  left: 10px; /* Position closer to the screen edge */
+}
+
+.saved-drawings-list {
+  padding: 1rem;
+}
+
+.saved-drawings-list h3 {
+  margin-top: 0;
+}
+
+.saved-drawings-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.saved-drawings-list li {
+  margin: 5px 0;
+}
+
+.sidebar.open + .main-content {
+  margin-left: 250px; /* Shift content only if sidebar is open */
+}
