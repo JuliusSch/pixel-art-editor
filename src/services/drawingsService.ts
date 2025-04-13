@@ -1,4 +1,4 @@
-import { db, auth } from '../firebaseConfig'
+import { db, auth } from '../../firebaseConfig'
 import { collection, addDoc, query, where, getDocs } from 'firebase/firestore'
 
 export interface Drawing {

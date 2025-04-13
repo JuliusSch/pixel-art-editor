@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { signUpUser, loginUser } from './authService'
+import { signUpUser, loginUser } from '../services/authService'
+import '../styles/authModal.css'
 
 interface AuthModalProps {
   isOpen: boolean
