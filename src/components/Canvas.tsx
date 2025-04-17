@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
-//import ColourPicker from './ColourPicker'
 import { LOCAL_STORAGE_KEYS } from '../constants'
 import '../styles/canvas.css'
 import '../styles/App.css'
@@ -17,14 +16,14 @@ interface CanvasProps {
   selectedColour: string
 }
 
-const Canvas : React.FC<CanvasProps> = forwardRef<CanvasHandle, CanvasProps>(({ selectedColour }, ref) => {
+const Canvas = forwardRef<CanvasHandle, CanvasProps>(({ selectedColour }, ref) => {
 
-   const [isDragging, setIsDragging] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const [grid, setGrid] = useState<string[][]>(
     Array.from({ length: gridHeight }, () => Array(gridWidth).fill('#ffffff'))
   )
 
-// #region Load local/firebase storage
+  // #region Load local/firebase storage
 
   useEffect(() => { // Hook to synchronise component with external system (database)
     const savedGrid = localStorage.getItem(LOCAL_STORAGE_KEYS.PIXEL_GRID)
@@ -45,7 +44,7 @@ const Canvas : React.FC<CanvasProps> = forwardRef<CanvasHandle, CanvasProps>(({ 
     };
   }, [])
 
-// #endregion
+  // #endregion
 
   const colourPixel = (row: number, col: number) => {
     const newGrid = grid.map((rowArray, rowIndex) =>
@@ -62,7 +61,7 @@ const Canvas : React.FC<CanvasProps> = forwardRef<CanvasHandle, CanvasProps>(({ 
     getGrid: () => grid
   }))
 
-// #region Mouse event handlers
+  // #region Mouse event handlers
 
   const handleMouseDown = (event: React.MouseEvent, row: number, col: number) => {
     event.preventDefault()

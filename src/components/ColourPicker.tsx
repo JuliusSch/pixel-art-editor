@@ -6,7 +6,7 @@ interface ColourPickerProps {
   setSelectedColour: (colour: string) => void
 }
 
-function ColourPicker({ selectedColour, setSelectedColour }: ColourPickerProps)
+export default function ColourPicker({ selectedColour, setSelectedColour } : ColourPickerProps)
 {
   const handleColourChange = (colour: string) => {
       setSelectedColour(colour)
@@ -33,5 +33,3 @@ function ColourPicker({ selectedColour, setSelectedColour }: ColourPickerProps)
     </div>
   )
 }
-
-export default ColourPicker

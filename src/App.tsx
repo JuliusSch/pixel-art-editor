@@ -1,5 +1,4 @@
 import './styles/app.css'
-import './styles/sidebar.css'
 import Canvas, { CanvasHandle, gridWidth, gridHeight } from './components/Canvas'
 import AuthModal from './components/AuthModal'
 import { useState, useEffect, useRef } from 'react'
@@ -8,18 +7,16 @@ import { fetchDrawings, saveDrawing, Drawing } from './services/drawingsService'
 import { auth } from '../firebaseConfig'
 import ColourPicker from './components/ColourPicker'
 import { LOCAL_STORAGE_KEYS } from './constants'
+import SidePanel from './components/SidePanel'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFloppyDisk, faTrash } from '@fortawesome/free-solid-svg-icons'
 
-function App() {
+export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [savedDrawings, setDrawings] = useState<Drawing[]>([])
-  const [isSideBarOpen, setIsSideBarOpen] = useState(false)
   const [selectedColour, setSelectedColour] = useState('#000000')
 
   const canvasRef = useRef<CanvasHandle>(null);
-  
-  const toggleSidebar = () => {
-    setIsSideBarOpen(!isSideBarOpen)
-  }
 
   function handleModalClose() { setIsModalOpen(false) }
 
@@ -39,7 +36,6 @@ function App() {
     if (auth.currentUser) {
       if (canvasRef.current) {
         console.log(auth.currentUser)
-        // await canvasRef.current.saveCurrentDrawing()
         const drawingName = prompt('Enter a name for this drawing:')
         if (drawingName && auth.currentUser) {
           await saveDrawing(drawingName, canvasRef.current.getGrid())
@@ -54,7 +50,7 @@ function App() {
 
   const loadDrawing = (drawingGrid: string[][]) => {
     if (canvasRef.current) {
-      console.log("load drawing")
+      console.log("loading drawing...")
       canvasRef.current.setGrid(drawingGrid)
       // localStorage.setItem(LOCAL_STORAGE_KEYS.PIXEL_GRID, JSON.stringify(drawingGrid))
     }
@@ -86,23 +82,7 @@ function App() {
     <>
       <div>
         <h1>Pixel Art Editor</h1>
-        <div className={`sidebar ${isSideBarOpen ? 'open' : 'closed'}`}>
-          <button className='sidebar-toggle' onClick={toggleSidebar}>
-            {isSideBarOpen ? '<' : '>'}
-          </button>
-          {isSideBarOpen && (
-            <div className='saved-drawings-list'>
-              <h3>Saved Drawings</h3>
-              <ul>
-                {savedDrawings.map((drawing, index) => (
-                  <li key={index}>
-                    <button onClick={() => loadDrawing(drawing.grid)}>{drawing.name}</button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        <SidePanel savedDrawings={savedDrawings} loadDrawing={loadDrawing}/>
         <button onClick={() => setIsModalOpen(true)} style={{ position: 'absolute', top: 10, right: 10 }}>
           {auth.currentUser ? 'Logged In' : 'Sign Up/Login'}
         </button>
@@ -111,15 +91,17 @@ function App() {
           onClose={handleModalClose}
           onAuthSuccess={updateAfterLogin}
         />
-        <Canvas selectedColour={selectedColour}/>
+        <Canvas selectedColour={selectedColour} ref={canvasRef} />
         <ColourPicker selectedColour={selectedColour} setSelectedColour={setSelectedColour}/>
         <div className='canvas-buttons'>
-          <button className='canvas-button' onClick={clearCanvas}>Clear Canvas</button>
-          <button className='canvas-button' onClick={saveCurrentDrawing}>Save Drawing</button>
+          <button className='canvas-button' onClick={clearCanvas}>
+            <FontAwesomeIcon icon={faTrash}/>
+          </button>
+          <button className='canvas-button' onClick={saveCurrentDrawing}>
+            <FontAwesomeIcon icon={faFloppyDisk}/>
+          </button>
         </div>
       </div>
     </>
   )
 }
-
-export default App

@@ -8,7 +8,7 @@ interface AuthModalProps {
   onAuthSuccess: () => Promise<void>
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuthSuccess }) => {
+function AuthModal({ isOpen, onClose, onAuthSuccess }: AuthModalProps) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [isSignUp, setIsSignUp] = useState(true)
