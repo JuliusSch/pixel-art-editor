@@ -6,7 +6,7 @@ import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons"
 
 interface SidePanelProps {
   savedDrawings: Drawing[],
-  loadDrawing: (drawingGrid: string[][]) => void
+  loadDrawing: (drawing: Drawing, loadToLocalStorage: boolean) => void
 }
 
 export default function SidePanel({savedDrawings, loadDrawing} : SidePanelProps) {
@@ -24,13 +24,13 @@ export default function SidePanel({savedDrawings, loadDrawing} : SidePanelProps)
         <ul className='saved-drawings-list'>
           {savedDrawings.map((drawing, index) => (
             <li key={index}>
-              <button className="saved-drawing-button" onClick={() => loadDrawing(drawing.grid)}>{drawing.name}</button>
+              <button className="saved-drawing-button" onClick={() => loadDrawing(drawing, true)}>{drawing.name}</button>
             </li>
           ))}
         </ul>
       </div>
       <button className='side-panel-button' onClick={toggleSidePanel}>
-        {isSidePanelOpen ? <FontAwesomeIcon icon={faArrowRight} /> : <FontAwesomeIcon icon={faArrowLeft} />}
+        {isSidePanelOpen ? <FontAwesomeIcon icon={faArrowLeft} /> : <FontAwesomeIcon icon={faArrowRight} />}
       </button>
     </div>
   )
