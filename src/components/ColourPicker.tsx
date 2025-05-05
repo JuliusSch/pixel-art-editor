@@ -1,5 +1,5 @@
 import { HexColorPicker } from "react-colorful";
-import { LOCAL_STORAGE_KEYS } from '../constants'
+import { LOCAL_STORAGE_KEYS } from '../utils/constants'
 
 interface ColourPickerProps {
   selectedColour: string

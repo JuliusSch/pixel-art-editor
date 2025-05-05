@@ -1,5 +1,5 @@
-import { signUpUser, loginUser, onAuthChange } from '../services/authService'
-import { auth } from '../../firebaseConfig'
+import { signUpUser, loginUser, onAuthChange } from '../services/AuthService'
+import { auth } from '../../config/firebaseConfig'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, User } from 'firebase/auth'
 import 'jest'
 
