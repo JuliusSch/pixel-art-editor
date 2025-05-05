@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react'
-import { LOCAL_STORAGE_KEYS } from '../constants'
+import { LOCAL_STORAGE_KEYS } from '../utils/constants'
 import '../styles/canvas.css'
 import '../styles/App.css'
 import { useClientStateStore } from '../services/ClientStateService'

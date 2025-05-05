@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { signUpUser, loginUser } from '../services/authService'
+import { signUpUser, loginUser } from '../services/AuthService'
 import '../styles/authModal.css'
 
 interface AuthModalProps {

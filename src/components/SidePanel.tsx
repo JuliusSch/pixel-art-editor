@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Drawing } from "../services/drawingsService"
+import { Drawing } from "../services/DrawingsService"
 import '../styles/sidePanel.css'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons"

@@ -1,5 +1,5 @@
 import { onAuthStateChanged, User, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../../firebaseConfig'
+import { auth } from '../../config/firebaseConfig'
 
 type AuthResult = User | null
 
