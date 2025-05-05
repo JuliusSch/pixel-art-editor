@@ -2,7 +2,7 @@
   position: fixed;
   left: 0;
   top: 0;
-  width: 300px; /* Adjust width as needed */
+  width: 300px;
   height: 100%;
   max-width: 100%;
   color: white;
@@ -12,20 +12,20 @@
   overflow-y: auto;
 }
 
-.side-panel-container.open {
+.side-panel-container.closed {
   transform: translateX(-80%);
 }
 
-.side-panel-container.closed {
+.side-panel-container.open {
   transform: translateX(0%);
   opacity: 100%;
 }
 
-.saved-drawings-panel.open {
+.saved-drawings-panel.closed {
   opacity: 0%
 }
 
-.saved-drawings-panel.closed {
+.saved-drawings-panel.open {
   opacity: 100%
 }
 
@@ -37,24 +37,19 @@
   color: white;
   border-radius: 50%;
   border: none;
-  width: 35px;
-  height: 35px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: transform 0.3s ease;
-  z-index: 1001; /* Layer above sidebar */
   opacity: 1;
-}
-
-.side-panel-container.collapsed + .side-panel-button {
-  left: 10px; /* Position closer to the screen edge */
 }
 
 .saved-drawings-panel {
   padding: 1rem;
-  background-color: #333; /* Darker background to contrast */
+  background-color: #333;
   position: fixed;
   left: 0;
   top: 0;
@@ -89,7 +84,3 @@
   width: 100%;
   text-align: left;
 }
-/* 
-.side-panel-container.open + .main-content {
-  margin-left: 200px;
-} */
